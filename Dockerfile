@@ -103,7 +103,7 @@ RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /start.sh &&
 
 ARG svn_user
 ARG svn_pass
-ARG svn_repo="svn://svn.alg-network.com/dev/interdev/spip/tags/generic"
+ARG svn_repo="svn://trac.rezo.net/spip"
 
 # copy in code
 RUN svn checkout --force --username $svn_user --password="$svn_pass" $svn_repo /var/www/html
