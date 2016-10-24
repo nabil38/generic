@@ -101,9 +101,9 @@ ADD secret/servers /root/.subversion/servers
 ADD docs/config_spip /root/config_spip
 RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /start.sh && chmod 755 /install.sh
 
-ARG svn_user
-ARG svn_pass
-ARG svn_repo="svn://trac.rezo.net/spip"
+#ARG svn_user
+#ARG svn_pass
+#ARG svn_repo="svn://trac.rezo.net/spip"
 
 # copy in code
 RUN svn checkout --force --username $svn_user --password="$svn_pass" $svn_repo /var/www/html
