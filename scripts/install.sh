@@ -37,7 +37,7 @@ if [[ "$RESULT" == "0" ]] ; then
     BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/MYSQL/$SITE_DB_NAME.sql.tar.gz)
     if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
       echo "    No database backup found on production backup server for $DOMAINE_NAME in last backup folder ${BACKUP_FOLDER}"
-			if [[ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ]] ;then
+			if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
 				BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$SITE_DB_NAME.sql.tar.gz)
 				if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
 		      echo "    No database backup found on deploiment ftp server for $DOMAINE_NAME"
@@ -94,7 +94,7 @@ if [ $(ls /var/www/html/IMG | wc -l) -lt 1 ];then
     if [ -z "${BACKUP_IMG_FILE}" ] ;then
       echo "    No IMG backup found on production backup server for $DOMAINE_NAME in last backup folder ${BACKUP_FOLDER}"
 			# recuperation de la sauvegarde pour le deploiement
-			if [[ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ]] ;then
+			if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
 				BACKUP_IMG_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/"$DATA_VOLUME"_IMG.tar.gz)
 		    if [ -z "${BACKUP_IMG_FILE}" ] ;then
 		      echo "    No IMG backup (/$BC_ENV_FTP_DIRECTORY/$DATA_VOLUME_IMG.tar.gz) found for $DOMAINE_NAME in deploiment ftp server"
