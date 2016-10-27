@@ -29,7 +29,7 @@ FTP_DIRECTORY=${BC_ENV_FTP_DIRECTORY}
 # restoring database
 if [[ "$RESULT" == "0" ]] ; then
   echo "Creating new empty database $SITE_DB_NAME"
-  mysql -h$SITE_DATABASE_HOST -u root -p$SITE_DB_ROOT_PASSWORD -e "CREATE DATABASE `$SITE_DB_NAME`;"
+  mysql -h$SITE_DATABASE_HOST -u root -p$SITE_DB_ROOT_PASSWORD -e "CREATE DATABASE \`$SITE_DB_NAME\`;"
 
   echo "Looking for database restore"
   BACKUP_FOLDER=$(ncftpls -x "-lt" -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY | grep backup | head -1 | awk '{print $9}')
