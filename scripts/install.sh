@@ -115,7 +115,14 @@ if [ $(ls /var/www/html/IMG | wc -l) -lt 1 ];then
 #    mv /root/config_spip/mes_options.php /var/www/html/config/.
   else
     echo "Recuperation de la sauvegarde IMG pour $DOMAINE_NAME"
-    mv IMG/* /var/www/html/IMG/.
-    rm -rf IMG $BACKUP_IMG_FILE
+    if [ -d IMG ]; then
+			mv IMG/* /var/www/html/IMG/.
+    	rm -rf IMG $BACKUP_IMG_FILE
+		elif [ -d "$DATA_VOLUME"_IMG ]; then
+			mv "$DATA_VOLUME"_IMG/* /var/www/html/IMG/.
+    	rm -rf "$DATA_VOLUME"_IMG $BACKUP_IMG_FILE
+		else
+			echo "impossible de restaurer les images verfier le nom du repertoire de sauvegarde"
+		fi
   fi
 fi
