@@ -17,7 +17,7 @@ FTP_DIRECTORY=${BC_ENV_FTP_DIRECTORY}
 [ -z "${BC_ENV_FTP_DIRECTORY}" ] && { echo "=> BC_ENV_FTP_DIRECTORY cannot be empty, link to backup service first" && exit 1; }
 
 # Database setup
-: "${SITE_DATABASE_HOST:=galera-lb.galera}"
+: "${SITE_DATABASE_HOST:=mysql}"
 
 # Check if database exist
 {
