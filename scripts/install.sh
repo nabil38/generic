@@ -32,29 +32,29 @@ if [[ "$RESULT" == "0" ]] ; then
   mysql -h$SITE_DATABASE_HOST -u root -p$SITE_DB_ROOT_PASSWORD -e "CREATE DATABASE \`$SITE_DB_NAME\`;"
 
   echo "Looking for database restore"
-  BACKUP_FOLDER=$(ncftpls -x "-lt" -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY | grep backup | head -1 | awk '{print $9}')
-  if [ -n "${BACKUP_FOLDER}" ] ;then
-    BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/MYSQL/$SITE_DB_NAME.sql.tar.gz)
-    if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
-      echo "    No database backup found on production backup server for $DOMAINE_NAME in last backup folder ${BACKUP_FOLDER}"
-			if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
-				BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$SITE_DB_NAME.sql.tar.gz)
-				if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
-		      echo "    No database backup found on deploiment ftp server for $DOMAINE_NAME"
-		    else
-		      echo "    Found deploiment mysql backup for $DOMAINE_NAME"
-		      ncftpget -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_MYSQL_FILE
+	if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
+		BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$SITE_DB_NAME.sql.tar.gz)
+		if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
+      echo "    No database backup found on deploiment ftp server for $DOMAINE_NAME"
+			BACKUP_FOLDER=$(ncftpls -x "-lt" -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY | grep backup | head -1 | awk '{print $9}')
+		  if [ -n "${BACKUP_FOLDER}" ] ;then
+		    BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/MYSQL/$SITE_DB_NAME.sql.tar.gz)
+		    if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
+		      echo "    No database backup found on production backup server for $DOMAINE_NAME in last backup folder ${BACKUP_FOLDER}"
+				else
+		      echo "    Found latest mysql backup for $DOMAINE_NAME"
+		      ncftpget -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/MYSQL/$BACKUP_MYSQL_FILE
 		      tar -xvzf $BACKUP_MYSQL_FILE
 		      BACKUP_MYSQL_FILE=$SITE_DB_NAME.sql
 		    fi
 			fi
     else
-      echo "    Found latest mysql backup for $DOMAINE_NAME"
-      ncftpget -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/MYSQL/$BACKUP_MYSQL_FILE
+      echo "    Found deploiment mysql backup for $DOMAINE_NAME"
+      ncftpget -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_MYSQL_FILE
       tar -xvzf $BACKUP_MYSQL_FILE
       BACKUP_MYSQL_FILE=$SITE_DB_NAME.sql
     fi
-  fi
+	fi
   if [ -z "${BACKUP_MYSQL_FILE}" ]; then
     echo "No database backup found"
     mv /root/config_spip/mes_options.php /var/www/html/config/.
@@ -88,28 +88,28 @@ rm -rf /root/config_spip
 # Restoring FILES
 if [ $(ls /var/www/html/IMG | wc -l) -lt 1 ];then
   echo "Looking for Files to restore"
-  BACKUP_FOLDER=$(ncftpls -x "-lt" -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY | grep backup | head -1 | awk '{print $9}')
-  if [ -n "${BACKUP_FOLDER}" ] ;then
-    BACKUP_IMG_FILE=$(ncftpls -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/FILES/"$DATA_VOLUME"_IMG.tar.gz)
-    if [ -z "${BACKUP_IMG_FILE}" ] ;then
-      echo "    No IMG backup found on production backup server for $DOMAINE_NAME in last backup folder ${BACKUP_FOLDER}"
-			# recuperation de la sauvegarde pour le deploiement
-			if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
-				BACKUP_IMG_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/"$DATA_VOLUME"_IMG.tar.gz)
+	# recuperation de la sauvegarde pour le deploiement
+	if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
+		BACKUP_IMG_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/"$DATA_VOLUME"_IMG.tar.gz)
+		if [ -z "${BACKUP_IMG_FILE}" ] ;then
+			echo "    No IMG backup (/$BC_ENV_FTP_DIRECTORY/$DATA_VOLUME_IMG.tar.gz) found for $DOMAINE_NAME in deploiment ftp server"
+		  BACKUP_FOLDER=$(ncftpls -x "-lt" -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY | grep backup | head -1 | awk '{print $9}')
+		  if [ -n "${BACKUP_FOLDER}" ] ;then
+		    BACKUP_IMG_FILE=$(ncftpls -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/FILES/"$DATA_VOLUME"_IMG.tar.gz)
 		    if [ -z "${BACKUP_IMG_FILE}" ] ;then
-		      echo "    No IMG backup (/$BC_ENV_FTP_DIRECTORY/$DATA_VOLUME_IMG.tar.gz) found for $DOMAINE_NAME in deploiment ftp server"
+		      echo "    No IMG backup found on production backup server for $DOMAINE_NAME in last backup folder ${BACKUP_FOLDER}"
 		    else
-		      echo "    Found deploiment IMG backup for $DOMAINE_NAME"
-		      ncftpget -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_IMG_FILE
+		      echo "    Found latest IMG backup for $DOMAINE_NAME"
+		      ncftpget -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/FILES/$BACKUP_IMG_FILE
 		      tar -xvzf $BACKUP_IMG_FILE
 		    fi
-			fi
-    else
-      echo "    Found latest IMG backup for $DOMAINE_NAME"
-      ncftpget -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/FILES/$BACKUP_IMG_FILE
-      tar -xvzf $BACKUP_IMG_FILE
-    fi
-  fi
+		  fi
+		else
+			echo "    Found deploiment IMG backup for $DOMAINE_NAME"
+			ncftpget -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_IMG_FILE
+			tar -xvzf $BACKUP_IMG_FILE
+		fi
+	fi
   if [ -z "${BACKUP_IMG_FILE}" ]; then
     echo "No IMG backup found"
 #    mv /root/config_spip/mes_options.php /var/www/html/config/.
