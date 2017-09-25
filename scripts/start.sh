@@ -63,11 +63,11 @@ procs=$(cat /proc/cpuinfo |grep processor | wc -l)
 sed -i -e "s/worker_processes 5/worker_processes $procs/" /etc/nginx/nginx.conf
 
 # vérification de l'existance d'une branche pour le site
-BRANCHE=$(svn info /var/www/html/ | grep URL: | head -1 | awk '{ print $2}')
-BRANCHE_CIBLE=$(svn info svn://svn.alg-network.com/dev/interdev/spip/branches/$DOMAINE_NAMEf | grep URL: | head -1 | awk '{ print $2}')
+BRANCHE=$(svn info /var/www/html/ | grep URL | head -1 | awk '{ print $2}')
+BRANCHE_CIBLE=$(svn info $SVN_REPO | grep URL | head -1 | awk '{ print $2}')
 if [ ! -z $BRANCHE_CIBLE ] && [ $BRANCHE != $BRANCHE_CIBLE ]; then
   echo "Migration vers $DOMAINE_NAME "
-  svn switch svn://svn.alg-network.com/dev/interdev/spip/branches/$DOMAINE_NAME /var/www/html --quiet
+  svn switch $SVN_REPO /var/www/html --quiet
 fi
 
 if [ ! -d "/var/www/html/plugins/squelettes" ] ; then

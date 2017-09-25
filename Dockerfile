@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:3.6
 
 MAINTAINER Nabil Djidi <public@djidi.com>
 
@@ -105,10 +105,10 @@ RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /start.sh &&
 
 #ARG svn_user
 #ARG svn_pass
-#ARG svn_repo="svn://trac.rezo.net/spip"
+#ARG svn_repo
 # $svn_user, $svn_pass et $svn_repo sont remplacés par imagebuilder lors de la recompile
 
-RUN echo $(svn info --show-item revision $svn_repo) && \
+RUN echo $(svn info --show-item revision --username $svn_user --password="$svn_pass" $svn_repo) && \
 echo "$timestamp"
 
 # copy in code
