@@ -80,6 +80,9 @@ if [ ! -d "/var/www/html/plugins/themes" ] ; then
   svn checkout svn://svn.alg-network.com/dev/design/$DOMAINE_NAME/theme /var/www/html/plugins/themes/$DOMAINE_NAME --quiet
 fi
 
+# tweak nginx.conf
+sed -i -e "s/localhost/$DOMAINE_NAME/g" /etc/nginx/sites-available/default.conf
+
 # Install website
 /install.sh
 

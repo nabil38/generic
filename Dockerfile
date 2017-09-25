@@ -45,11 +45,12 @@ ENV fpm_conf /etc/php5/php-fpm.conf
         mkdir -p /run/nginx && \
         mkdir -p /var/log/supervisor
 
-RUN apk --no-cache add ca-certificates && \
-wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/sgerrand/alpine-pkg-php5-memcached/master/sgerrand.rsa.pub && \
-wget https://github.com/sgerrand/alpine-pkg-php5-memcached/releases/download/2.2.0-r0/php5-memcached-2.2.0-r0.apk && \
-apk add php5-memcached-2.2.0-r0.apk && \
-rm php5-memcached-2.2.0-r0.apk
+RUN apk --no-cache add ca-certificates
+# memcache # && \
+# memcache # wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/sgerrand/alpine-pkg-php5-memcached/master/sgerrand.rsa.pub && \
+# memcache # wget https://github.com/sgerrand/alpine-pkg-php5-memcached/releases/download/2.2.0-r0/php5-memcached-2.2.0-r0.apk && \
+# memcache # apk add php5-memcached-2.2.0-r0.apk && \
+# memcache # rm php5-memcached-2.2.0-r0.apk
 
 # Copy our nginx config
 RUN rm -Rf /etc/nginx/nginx.conf
@@ -59,8 +60,8 @@ ADD conf/nginx.conf /etc/nginx/nginx.conf
 RUN sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" ${php_conf} && \
 sed -i -e "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} && \
 sed -i -e "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${php_conf} && \
-sed -i -e "s/session.save_handler = files/session.save_handler = memcache/g" ${php_conf} && \
-sed -i -e 's#;session.save_path = "/var/lib/php5"#session.save_path = "mcserver"#g' /${php_conf} && \
+# memcache # sed -i -e "s/session.save_handler = files/session.save_handler = memcache/g" ${php_conf} && \
+# memcache # sed -i -e 's#;session.save_path = "/var/lib/php5"#session.save_path = "mcserver"#g' /${php_conf} && \
 sed -i -e "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} && \
 sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" ${fpm_conf} && \
 sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" ${fpm_conf} && \
@@ -105,6 +106,10 @@ RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /start.sh &&
 #ARG svn_user
 #ARG svn_pass
 #ARG svn_repo="svn://trac.rezo.net/spip"
+# $svn_user, $svn_pass et $svn_repo sont remplacés par imagebuilder lors de la recompile
+
+RUN echo $(svn info --show-item revision $svn_repo) && \
+echo "$timestamp"
 
 # copy in code
 RUN svn checkout --force --username $svn_user --password="$svn_pass" $svn_repo /var/www/html
