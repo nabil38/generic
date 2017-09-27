@@ -74,7 +74,7 @@ if [[ "$RESULT_USER" == "0" ]] ; then
     mysql -h$SITE_DATABASE_HOST -uroot -p$SITE_DB_ROOT_PASSWORD -e "FLUSH PRIVILEGES;"
 fi
 
-# rstoring configration
+# rstoring spip configration
 if [ ! -f "/var/www/html/config/connect.php" ] ; then
   echo "mise à jour du fichier de connexion"
   sed -i -e "s/MYSQL_ADRESSE/$SITE_DATABASE_HOST/g" /root/config_spip/connect.php
@@ -84,6 +84,24 @@ if [ ! -f "/var/www/html/config/connect.php" ] ; then
   mv /root/config_spip/* /var/www/html/config/.
 fi
 rm -rf /root/config_spip
+if [ -d "/var/www/html/client" ] ; then
+	# rstoring thelia configration
+	if [ -f "/var/www/html/client/config_thelia.php" ] ; then
+	  echo "mise à jour du fichier de connexion thelia"
+	  sed -i -e "s/THELIA_BD_HOST/$SITE_DATABASE_HOST/g" /var/www/html/client/config_thelia.php
+	  sed -i -e "s/THELIA_BD_LOGIN/$SITE_DB_NAME/g" /var/www/html/client/config_thelia.php
+	  sed -i -e "s/THELIA_BD_PASSWORD/$SITE_DB_PASSWORD/g" /var/www/html/client/config_thelia.php
+	  sed -i -e "s/THELIA_BD_NOM/$SITE_DB_NAME/g" /var/www/html/client/config_thelia.php
+	  mv /root/config_spip/* /var/www/html/config/.
+	fi
+	if [ -f "/var/www/html/classes/Cnx.class.php.orig" ] ; then
+		mv /var/www/html/classes/Cnx.class.php.orig /var/www/html/classes/Cnx.class.php
+	fi
+
+	# Restoring thelia config files
+	echo "!!!!!!!!!May need to restore thelia config files"
+
+fi
 
 # Restoring FILES
 if [ $(ls /var/www/html/IMG | wc -l) -lt 1 ];then
