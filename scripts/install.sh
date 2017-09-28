@@ -81,6 +81,7 @@ if [ ! -f "/var/www/html/config/connect.php" ] ; then
   sed -i -e "s/MYSQL_USER/$SITE_DB_NAME/g" /root/config_spip/connect.php
   sed -i -e "s/MYSQL_PASSWORD/$SITE_DB_PASSWORD/g" /root/config_spip/connect.php
   sed -i -e "s/MYSQL_BASE/$SITE_DB_NAME/g" /root/config_spip/connect.php
+	mv /root/config_spip/* /var/www/html/config/.
 fi
 rm -rf /root/config_spip
 if [ -d "/var/www/html/client" ] ; then
@@ -91,7 +92,6 @@ if [ -d "/var/www/html/client" ] ; then
 	  sed -i -e "s/votre_login_mysql/$SITE_DB_NAME/g" /var/www/html/client/config_thelia.php
 	  sed -i -e "s/votre_motdepasse_mysql/$SITE_DB_PASSWORD/g" /var/www/html/client/config_thelia.php
 	  sed -i -e "s/bdd_sql/$SITE_DB_NAME/g" /var/www/html/client/config_thelia.php
-	  mv /root/config_spip/* /var/www/html/config/.
 	fi
 	if [ -f "/var/www/html/classes/Cnx.class.php.orig" ] ; then
 		mv /var/www/html/classes/Cnx.class.php.orig /var/www/html/classes/Cnx.class.php
