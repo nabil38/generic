@@ -141,16 +141,7 @@ if [ -d "/var/www/html/client" ] ; then
 			fi
 	  fi
 	fi
-
-
-
-
-
 fi
-
-
-
-
 
 # Restoring FILES
 if [ $(ls /var/www/html/IMG | wc -l) -lt 1 ];then
