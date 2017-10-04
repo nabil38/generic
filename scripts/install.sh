@@ -100,7 +100,57 @@ if [ -d "/var/www/html/client" ] ; then
 	# Restoring thelia config files
 	echo "!!!!!!!!!May need to restore thelia config files"
 
+	# Restoring FILES
+	if [ ! -f "/var/www/html/client/plugins/thelia_conf_ok.txt" ];then
+	  echo "Looking for Thelia config Files to restore"
+		touch /var/www/html/client/plugins/thelia_conf_ok.txt
+		# recuperation de la sauvegarde pour le deploiement
+		if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
+			BACKUP_CNF_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/"$DATA_VOLUME"_thelia_conf.tar.gz)
+			if [ -z "${BACKUP_CNF_FILE}" ] ;then
+				echo "    No thelia config backup (/$BC_ENV_FTP_DIRECTORY/$DATA_VOLUME_thelia_conf.tar.gz) found for $DOMAINE_NAME in deploiment ftp server"
+			  BACKUP_FOLDER=$(ncftpls -x "-lt" -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY | grep backup | head -1 | awk '{print $9}')
+			  if [ -n "${BACKUP_FOLDER}" ] ;then
+			    BACKUP_CNF_FILE=$(ncftpls -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/FILES/"$DATA_VOLUME"_thelia_conf.tar.gz)
+			    if [ -z "${BACKUP_CNF_FILE}" ] ;then
+			      echo "    No thelia config backup found on production backup server for $DOMAINE_NAME in last backup folder ${BACKUP_FOLDER}"
+			    else
+			      echo "    Found latest thelia config backup for $DOMAINE_NAME"
+			      ncftpget -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/FILES/$BACKUP_CNF_FILE
+			      tar -xvzf $BACKUP_CNF_FILE
+			    fi
+			  fi
+			else
+				echo "    Found deploiment thelia config backup for $DOMAINE_NAME"
+				ncftpget -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_CNF_FILE
+				tar -xvzf $BACKUP_CNF_FILE
+			fi
+		fi
+	  if [ -z "${BACKUP_CNF_FILE}" ]; then
+	    echo "No thelia config backup found"
+	#    mv /root/config_spip/mes_options.php /var/www/html/config/.
+	  else
+	    echo "Recuperation de la sauvegarde thelia config pour $DOMAINE_NAME"
+	    if [ -d thelia_conf ]; then
+				mv thelia_conf/atos/conf/* /var/www/html/client/plugins/atos/conf/.
+				mv thelia_conf/atos/config.php /var/www/html/client/plugins/atos/.
+				mv thelia_conf/vads/config.php /var/www/html/client/plugins/vads/.
+	    	rm -rf thelia_conf $BACKUP_CNF_FILE
+			else
+				echo "impossible de restaurer les fichiers de config thelia, verfier le nom du repertoire de sauvegarde"
+			fi
+	  fi
+	fi
+
+
+
+
+
 fi
+
+
+
+
 
 # Restoring FILES
 if [ $(ls /var/www/html/IMG | wc -l) -lt 1 ];then
@@ -109,7 +159,7 @@ if [ $(ls /var/www/html/IMG | wc -l) -lt 1 ];then
 	if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
 		BACKUP_IMG_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/"$DATA_VOLUME"_IMG.tar.gz)
 		if [ -z "${BACKUP_IMG_FILE}" ] ;then
-			echo "    No IMG backup (/$BC_ENV_FTP_DIRECTORY/$DATA_VOLUME_IMG.tar.gz) found for $DOMAINE_NAME in deploiment ftp server"
+			echo "    No IMG backup (/$BC_ENV_FTP_DIRECTORY/$DATA_VOLUME.tar.gz) found for $DOMAINE_NAME in deploiment ftp server"
 		  BACKUP_FOLDER=$(ncftpls -x "-lt" -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY | grep backup | head -1 | awk '{print $9}')
 		  if [ -n "${BACKUP_FOLDER}" ] ;then
 		    BACKUP_IMG_FILE=$(ncftpls -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/FILES/"$DATA_VOLUME"_IMG.tar.gz)
