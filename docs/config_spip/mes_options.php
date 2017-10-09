@@ -10,4 +10,6 @@ define('_ID_WEBMASTERS','1');
 	define('SPIP_ERREUR_REPORT',E_ALL);
 //	define('SPIP_ERREUR_REPORT',E_ALL^E_NOTICE^E_STRICT);
 	define('_AUTOBR', ''); # supprimer l'autobr de spip pour eviter la surcharge avec le <p> de ckeditor
+// permet d'éviter l'affichage de la redirection 302 (ça ne devrait plus être utile à partir d'une certaine version à venir de spip)
+	define('_SERVER_APACHE',true);
 ?>
