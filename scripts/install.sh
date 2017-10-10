@@ -74,7 +74,11 @@ if [[ "$RESULT_USER" == "0" ]] ; then
     mysql -h$SITE_DATABASE_HOST -uroot -p$SITE_DB_ROOT_PASSWORD -e "FLUSH PRIVILEGES;"
 fi
 
-# rstoring spip configration
+# restoring spip configration
+if [ ! -f "/var/www/html/config/mes_options.php" ] ; then
+  echo "mise à jour de la timezone"
+  sed -i -e "s/TIME_ZONE/$TIME_ZONE/g" /root/config_spip/mes_options.php
+fi
 if [ ! -f "/var/www/html/config/connect.php" ] ; then
   echo "mise à jour du fichier de connexion"
   sed -i -e "s/MYSQL_ADRESSE/$SITE_DATABASE_HOST/g" /root/config_spip/connect.php
