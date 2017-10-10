@@ -57,7 +57,6 @@ if [[ "$RESULT" == "0" ]] ; then
 	fi
   if [ -z "${BACKUP_MYSQL_FILE}" ]; then
     echo "No database backup found"
-    mv /root/config_spip/mes_options.php /var/www/html/config/.
   else
     echo "Recuperation de la base ${BACKUP_MYSQL_FILE}"
     mysql -u root -p$SITE_DB_ROOT_PASSWORD -h$SITE_DATABASE_HOST $SITE_DB_NAME < $BACKUP_MYSQL_FILE
@@ -140,6 +139,9 @@ if [ -d "/var/www/html/client" ] ; then
 				mv thelia_conf/atos/config.php /var/www/html/client/plugins/atos/.
 				mv thelia_conf/vads/config.php /var/www/html/client/plugins/vads/.
 	    	rm -rf thelia_conf $BACKUP_CNF_FILE
+				if [ ! -f "/var/www/html/client/plugins/atos/conf/pathfile" ] ; then
+				  sed -i -e "s/$DOMAINE_NAME/html/g" /var/www/html/client/plugins/atos/conf/pathfile
+				fi
 			else
 				echo "impossible de restaurer les fichiers de config thelia, verfier le nom du repertoire de sauvegarde"
 			fi
