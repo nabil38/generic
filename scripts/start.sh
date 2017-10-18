@@ -70,6 +70,10 @@ if [ ! -z $BRANCHE_CIBLE ] && [ $BRANCHE != $BRANCHE_CIBLE ]; then
   svn switch --ignore-ancestry $SVN_REPOSITORY /var/www/html --quiet
 fi
 
+echo "modification des compatbilités plugins pour fonctionner sur spip 3.2 (à supprimer une fois plus necessaire)"
+sed -i -e "s/3.1./3.2./g" /var/www/html/plugins/bootstrap/paquet.xml
+sed -i -e "s/3.1./3.2./g" /var/www/html/plugins/ckeditor-spip-plugin/paquet.xml
+
 if [ ! -d "/var/www/html/plugins/squelettes" ] ; then
 	echo "Installation du squelette"
   svn checkout svn://svn.alg-network.com/dev/interdev/plugins/squelettes/bootskin/branches/$DOMAINE_NAME /var/www/html/plugins/squelettes/$DOMAINE_NAME --quiet
