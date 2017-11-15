@@ -40,6 +40,7 @@ ENV fpm_conf /etc/php5/php-fpm.conf
         mysql-client \
         ncftp \
         sqlite \
+        php5-pdo_sqlite \
         php5-zip &&\
         mkdir -p /etc/nginx && \
         mkdir -p /var//app && \
