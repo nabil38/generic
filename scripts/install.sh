@@ -31,37 +31,54 @@ if [[ "$RESULT" == "0" ]] ; then
   echo "Creating new empty database $SITE_DB_NAME"
   mysql -h$SITE_DATABASE_HOST -u root -p$SITE_DB_ROOT_PASSWORD -e "CREATE DATABASE \`$SITE_DB_NAME\`;"
 
-  echo "Looking for database restore"
-	if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
-		BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$SITE_DB_NAME.sql.tar.gz)
-		if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
-      echo "    No database backup found on deploiment ftp server for $DOMAINE_NAME"
-			BACKUP_FOLDER=$(ncftpls -x "-lt" -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY | grep backup | head -1 | awk '{print $9}')
-		  if [ -n "${BACKUP_FOLDER}" ] ;then
-		    BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/MYSQL/$SITE_DB_NAME.sql.tar.gz)
-		    if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
-		      echo "    No database backup found on production backup server for $DOMAINE_NAME in last backup folder ${BACKUP_FOLDER}"
+	if [[ "$SITE_DEPLOYMENT" == "demo" ]] ; then
+		echo "Duplicating demo data base"
+		mysqldump -uroot -p$SITE_DB_ROOT_PASSWORD -h$SITE_DATABASE_HOST demo | mysql -uroot -p$SITE_DB_ROOT_PASSWORD -h$SITE_DATABASE_HOST $SITE_DB_NAME
+	else
+	  echo "Looking for database restore"
+		if [ -n "${BC_ENV_FTP_DEV_HOST}" ] && [ -n "${BC_ENV_FTP_DEV_USER}" ] && [ -n "${BC_ENV_FTP_DEV_PASS}" ] && [ -n "${BC_ENV_FTP_DEV_PORT}" ] ;then
+			if [[ "$SITE_DEPLOYMENT" == "demo" ]] ; then
+				echo "    Select demo db for $DOMAINE_NAME"
+				BACKUP_MYSQL_FILE="demo.sql.tar.gz"
+				MYSQL_FILE_NAME="demo.sql"
+			else
+				if [[ "$SITE_DEPLOYMENT" == "install" ]] ; then
+				echo "    Select install db for $DOMAINE_NAME"
+				BACKUP_MYSQL_FILE="install.sql.tar.gz"
+				MYSQL_FILE_NAME="install.sql"
 				else
-		      echo "    Found latest mysql backup for $DOMAINE_NAME"
-		      ncftpget -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/MYSQL/$BACKUP_MYSQL_FILE
-		      tar -xvzf $BACKUP_MYSQL_FILE
-		      BACKUP_MYSQL_FILE=$SITE_DB_NAME.sql
-		    fi
+					BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$SITE_DB_NAME.sql.tar.gz)
+					MYSQL_FILE_NAME=$SITE_DB_NAME.sql
+				fi
 			fi
-    else
-      echo "    Found deploiment mysql backup for $DOMAINE_NAME"
-      ncftpget -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_MYSQL_FILE
-      tar -xvzf $BACKUP_MYSQL_FILE
-      BACKUP_MYSQL_FILE=$SITE_DB_NAME.sql
-    fi
+			if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
+	      echo "    No database backup found on deploiment ftp server for $DOMAINE_NAME"
+				BACKUP_FOLDER=$(ncftpls -x "-lt" -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY | grep backup | head -1 | awk '{print $9}')
+			  if [ -n "${BACKUP_FOLDER}" ] ;then
+			    BACKUP_MYSQL_FILE=$(ncftpls -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/MYSQL/$SITE_DB_NAME.sql.tar.gz)
+			    if [ -z "${BACKUP_MYSQL_FILE}" ] ;then
+			      echo "    No database backup found on production backup server for $DOMAINE_NAME in last backup folder ${BACKUP_FOLDER}"
+					else
+			      echo "    Found latest mysql backup for $DOMAINE_NAME"
+			      ncftpget -u $BC_ENV_FTP_USER -p $BC_ENV_FTP_PASS -P $BC_ENV_FTP_PORT ftp://$BC_ENV_FTP_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_FOLDER/MYSQL/$BACKUP_MYSQL_FILE
+			      tar -xvzf $BACKUP_MYSQL_FILE
+			      BACKUP_MYSQL_FILE=$SITE_DB_NAME.sql
+			    fi
+				fi
+	    else
+	      echo "    Found deploiment mysql backup for $DOMAINE_NAME"
+	      ncftpget -u $BC_ENV_FTP_DEV_USER -p $BC_ENV_FTP_DEV_PASS -P $BC_ENV_FTP_DEV_PORT ftp://$BC_ENV_FTP_DEV_HOST/$BC_ENV_FTP_DIRECTORY/$BACKUP_MYSQL_FILE
+	      tar -xvzf $BACKUP_MYSQL_FILE
+	    fi
+		fi
+	  if [ -z "${BACKUP_MYSQL_FILE}" ]; then
+	    echo "No database backup found"
+	  else
+	    echo "Recuperation de la base ${MYSQL_FILE_NAME}"
+	    mysql -u root -p$SITE_DB_ROOT_PASSWORD -h$SITE_DATABASE_HOST $SITE_DB_NAME < $MYSQL_FILE_NAME
+	    rm -rf $MYSQL_FILE_NAME $MYSQL_FILE_NAME.tar.gz
+	  fi
 	fi
-  if [ -z "${BACKUP_MYSQL_FILE}" ]; then
-    echo "No database backup found"
-  else
-    echo "Recuperation de la base ${BACKUP_MYSQL_FILE}"
-    mysql -u root -p$SITE_DB_ROOT_PASSWORD -h$SITE_DATABASE_HOST $SITE_DB_NAME < $BACKUP_MYSQL_FILE
-    rm -rf $BACKUP_MYSQL_FILE $BACKUP_MYSQL_FILE.tar.gz
-  fi
 fi
 
 # Check if user exist
