@@ -73,15 +73,15 @@ fi
 echo "modification des compatbilités plugins pour fonctionner sur spip 3.2 (à supprimer une fois plus necessaire)"
 sed -i -e "s/3.1./3.2./g" /var/www/html/plugins/bootstrap/paquet.xml
 sed -i -e "s/3.1./3.2./g" /var/www/html/plugins/ckeditor-spip-plugin/paquet.xml
-
+if [ -z $DESIGN ] ; then DESIGN=$DOMAINE_NAME ; fi
 if [ ! -d "/var/www/html/plugins/squelettes" ] ; then
 	echo "Installation du squelette"
-  svn checkout svn://svn.alg-network.com/dev/interdev/plugins/squelettes/bootskin/branches/$DOMAINE_NAME /var/www/html/plugins/squelettes/$DOMAINE_NAME --quiet
+  svn checkout svn://svn.alg-network.com/dev/interdev/plugins/squelettes/bootskin/branches/$DESIGN /var/www/html/plugins/squelettes/$DESIGN --quiet
 fi
 
 if [ ! -d "/var/www/html/plugins/themes" ] ; then
 	echo "Installation du theme"
-  svn checkout svn://svn.alg-network.com/dev/design/$DOMAINE_NAME/theme /var/www/html/plugins/themes/$DOMAINE_NAME --quiet
+  svn checkout svn://svn.alg-network.com/dev/design/$DESIGN/theme /var/www/html/plugins/themes/$DESIGN --quiet
 fi
 
 # tweak nginx.conf
