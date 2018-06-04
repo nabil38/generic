@@ -99,6 +99,8 @@ ADD conf/supervisord.conf /etc/supervisord.conf
 # Add Scripts
 ADD scripts/start.sh /start.sh
 ADD scripts/install.sh /install.sh
+ADD scripts/demosetup.sh /demosetup.sh
+ADD scripts/demoinit.sh /demoinit.sh
 ADD scripts/pull /usr/bin/pull
 ADD scripts/push /usr/bin/push
 ADD secret/servers /root/.subversion/servers
