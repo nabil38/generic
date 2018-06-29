@@ -94,6 +94,7 @@ fi
 if [ ! -f "/var/www/html/config/mes_options.php" ] ; then
   echo "mise à jour de la timezone"
   sed -i -e "s/TIME_ZONE/$TIME_ZONE/g" /root/config_spip/mes_options.php
+	sed -i "16i define('_SYSTEM_TYPE','$SYSTEM_TYPE');" /root/config_spip/mes_options.php
 fi
 if [ ! -f "/var/www/html/config/connect.php" ] ; then
   echo "mise à jour du fichier de connexion"

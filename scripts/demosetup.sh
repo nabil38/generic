@@ -16,5 +16,8 @@ EOFF
 chmod +x /shiftdb.sh
 # programation du script pour exécution journalière
 ln -s /shiftdb.sh /etc/periodic/daily/shiftdb
+# annulation du décalage pour le Lundi et le vendredi pour éviter d'avoir un phénomene de stacking des commandes
+echo "0       2       *       *       1,5     ./shiftdb.sh -1" >> /etc/crontabs/root
+
 # demarage de crond si pas déjà démarré
 if [ $(ps -ef | grep -v grep | grep crond | wc -l) -eq 0 ]; then crond; fi
