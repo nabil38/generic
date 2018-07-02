@@ -74,6 +74,9 @@ if [[ "$RESULT" == "0" ]] ; then
 	  if [ -z "${BACKUP_MYSQL_FILE}" ]; then
 	    echo "No database backup found"
 	  else
+			if [[ "$SITE_DEPLOYMENT" == "install" ]] ; then
+				sed -i -e "s/demo2.gd-obs.com/$SITE_DATABASE_HOST/g" $MYSQL_FILE_NAME
+			fi
 	    echo "Recuperation de la base ${MYSQL_FILE_NAME}"
 	    mysql -u root -p$SITE_DB_ROOT_PASSWORD -h$SITE_DATABASE_HOST $SITE_DB_NAME < $MYSQL_FILE_NAME
 	    rm -rf $MYSQL_FILE_NAME $MYSQL_FILE_NAME.tar.gz
