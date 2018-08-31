@@ -86,6 +86,7 @@ fi
 
 # tweak nginx.conf
 sed -i -e "s/localhost/$DOMAINE_NAME/g" /etc/nginx/sites-available/default.conf
+[[ "$DOMAINE_NAME" =~ ".gd-obs.com"$ ]] && sed -i '1,6d' /etc/nginx/sites-available/default.conf
 
 # Install website
 /install.sh
