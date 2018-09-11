@@ -101,11 +101,12 @@ ADD scripts/start.sh /start.sh
 ADD scripts/install.sh /install.sh
 ADD scripts/demosetup.sh /demosetup.sh
 ADD scripts/demoinit.sh /demoinit.sh
+ADD scripts/deployinstdb.sh /deployinstdb.sh
 ADD scripts/pull /usr/bin/pull
 ADD scripts/push /usr/bin/push
 ADD secret/servers /root/.subversion/servers
 ADD docs/config_spip /root/config_spip
-RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /start.sh && chmod 755 /install.sh && chmod 755 /demosetup.sh && chmod 755 /demoinit.sh
+RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /start.sh && chmod 755 /install.sh && chmod 755 /demosetup.sh && chmod 755 /demoinit.sh && chmod 755 /deployinstdb.sh
 
 #ARG svn_user
 #ARG svn_pass
