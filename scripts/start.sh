@@ -68,11 +68,18 @@ BRANCHE_CIBLE=$(svn info $SVN_REPOSITORY | grep URL | head -1 | awk '{ print $2}
 if [ ! -z $BRANCHE_CIBLE ] && [ $BRANCHE != $BRANCHE_CIBLE ]; then
   echo "Migration vers $DOMAINE_NAME "
   svn switch --ignore-ancestry $SVN_REPOSITORY /var/www/html --quiet
+else
+  echo "Mise à jour de $DOMAINE_NAME "
+  svn update /var/www/html --quiet
 fi
 
 echo "modification des compatbilités plugins pour fonctionner sur spip 3.2 (à supprimer une fois plus necessaire)"
 sed -i -e "s/3.1./3.2./g" /var/www/html/plugins/bootstrap/paquet.xml
 sed -i -e "s/3.1./3.2./g" /var/www/html/plugins/ckeditor-spip-plugin/paquet.xml
+if [ -f "/var/www/html/plugins/gis/saisies/carte.html"] ; then
+  sed -i "/departement/d" /var/www/html/plugins/gis/saisies/carte.html
+  sed -i "/country_code/d" /var/www/html/plugins/gis/saisies/carte.html
+fi
 if [ -z $DESIGN ] ; then DESIGN=$DOMAINE_NAME ; fi
 if [ ! -d "/var/www/html/plugins/squelettes" ] ; then
 	echo "Installation du squelette"
