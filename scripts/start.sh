@@ -120,4 +120,10 @@ chown -Rf nginx.nginx /var/www/html
 echo "demarrage des services"
 /usr/bin/supervisord -n -c /etc/supervisord.conf
 
+# netpyage périodique du cache javascript pour éviter l'explosion et le blocage en attendant de traiter la source
+# nétoyage du cache js une fois par semaine
+sed -i "\$i 0       3       *       *       1       rm -rf /var/www/html/local/cache-js" /etc/crontabs/root
+# demarage de crond si pas déjà démarré
+if [ $(ps -ef | grep -v grep | grep crond | wc -l) -eq 0 ]; then crond; fi
+
 exec "$@"
