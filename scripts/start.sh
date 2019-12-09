@@ -96,9 +96,11 @@ sed -i -e "s/localhost/$DOMAINE_NAME/g" /etc/nginx/sites-available/default.conf
 [[ "$DOMAINE_NAME" =~ ".gd-obs.com"$ ]] && sed -i '1,6d' /etc/nginx/sites-available/default.conf
 
 # Install website
+echo "Installation Site"
 /install.sh
 
 # Always chown webroot for better mounting
+echo "changement droits"
 chown -Rf nginx.nginx /var/www/html
 
 #
@@ -107,7 +109,7 @@ chown -Rf nginx.nginx /var/www/html
 #  if [ -d "/var/www/html/scripts/" ]; then
 #    # make scripts executable incase they aren't
 #    chmod -Rf 750 /var/www/html/scripts/*
-    # run scripts in number order
+#    # run scripts in number order
 #    for i in `ls /var/www/html/scripts/`; do /var/www/html/scripts/$i ; done
 #  else
 #    echo "Can't find script directory"
@@ -115,6 +117,7 @@ chown -Rf nginx.nginx /var/www/html
 #fi
 
 # Start supervisord and services
+echo "demarrage des services"
 /usr/bin/supervisord -n -c /etc/supervisord.conf
 
 exec "$@"
