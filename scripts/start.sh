@@ -101,7 +101,7 @@ echo "Installation Site"
 
 # Always chown webroot for better mounting
 echo "changement droits"
-chown -Rf nginx.nginx /var/www/html
+# chown -Rf nginx.nginx /var/www/html
 
 #
 # Run custom scripts
