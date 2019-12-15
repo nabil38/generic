@@ -83,7 +83,11 @@ if [[ "$RESULT" == "0" ]] ; then
 	  fi
 	fi
 fi
-
+# check if MYSQL is correctly configured
+MYSQL_GLOBAL="$(mysql -h$SITE_DATABASE_HOST -uroot -p$SITE_DB_ROOT_PASSWORD -se "SELECT @@GLOBAL.sql_mode global")"
+if [[ "$MYSQL_GLOBAL" != "" ]] ; then
+	  mysql -h$SITE_DATABASE_HOST -uroot -p$SITE_DB_ROOT_PASSWORD -e "SET GLOBAL sql_mode = '';"
+fi
 # Check if user exist
 RESULT_USER="$(mysql -h$SITE_DATABASE_HOST -uroot -p$SITE_DB_ROOT_PASSWORD -se "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = '$SITE_DB_NAME')")"
 # Configuring database credentials
@@ -211,6 +215,10 @@ if [ $(ls /var/www/html/IMG | wc -l) -lt 1 ];then
 		fi
   fi
 fi
+
+# workaround récupération geo dans evts
+sed -i '/departement/d' /var/www/html/plugins/gis/saisies/carte.html
+sed -i '/country_code/d' /var/www/html/plugins/gis/saisies/carte.html
 
 # netpyage périodique du cache javascript pour éviter l'explosion et le blocage en attendant de traiter la source
 # nétoyage du cache js une fois par semaine

@@ -105,6 +105,8 @@ chown -Rf nginx.nginx /var/www/html/IMG
 chown -Rf nginx.nginx /var/www/html/tmp
 chown -Rf nginx.nginx /var/www/html/local
 chown -Rf nginx.nginx /var/www/html/client/cache
+chown -Rf nginx.nginx /var/www/html/plugins/expocompta/export
+chown -Rf nginx.nginx /var/www/html/plugins/themes
 
 #
 # Run custom scripts
