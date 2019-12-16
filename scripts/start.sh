@@ -81,12 +81,12 @@ if [ -f "/var/www/html/plugins/gis/saisies/carte.html"] ; then
   sed -i "/country_code/d" /var/www/html/plugins/gis/saisies/carte.html
 fi
 if [ -z $DESIGN ] ; then DESIGN=$DOMAINE_NAME ; fi
-if [ ! -d "/var/www/html/plugins/squelettes" ] ; then
+if [ ! -d "/var/www/html/plugins/squelettes/$DESIGN" ] ; then
 	echo "Installation du squelette"
   svn checkout svn://svn.alg-network.com/dev/interdev/plugins/squelettes/bootskin/branches/$DESIGN /var/www/html/plugins/squelettes/$DESIGN --quiet
 fi
 
-if [ ! -d "/var/www/html/plugins/themes" ] ; then
+if [ ! -d "/var/www/html/plugins/themes/$DESIGN" ] ; then
 	echo "Installation du theme"
   svn checkout svn://svn.alg-network.com/dev/design/$DESIGN/theme /var/www/html/plugins/themes/$DESIGN --quiet
 fi
