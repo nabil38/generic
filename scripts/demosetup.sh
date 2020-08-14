@@ -9,6 +9,9 @@ update spip_evenements set date_debut=DATE_ADD(date_debut, INTERVAL \$DAYS DAY),
 update commande set date=DATE_ADD(date, INTERVAL \$DAYS DAY),datefact=DATE_ADD(datefact, INTERVAL \$DAYS DAY);
 update spip_mouvements set date_mvt=DATE_ADD(date_mvt, INTERVAL \$DAYS DAY) where mouvement!='origine';
 update spip_paiements set date=DATE_ADD(date, INTERVAL \$DAYS DAY);
+update spip_paiements set date_validation=DATE_ADD(date_validation, INTERVAL $DAYS DAY) where date_validation!='0000-00-00';
+update spip_paiements set date_encaissement=DATE_ADD(date_encaissement, INTERVAL $DAYS DAY) where date_encaissement!='0000-00-00';
+update spip_paiements set date_annulation=DATE_ADD(date_annulation, INTERVAL $DAYS DAY) where date_annulation!='0000-00-00';
 update spip_remises set date=DATE_ADD(date, INTERVAL \$DAYS DAY);
 update spip_soins set date_soin=DATE_ADD(date_soin, INTERVAL \$DAYS DAY);
 EOF
