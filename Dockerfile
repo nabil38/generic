@@ -29,6 +29,7 @@ ENV fpm_conf /etc/php5/php-fpm.conf
         php5-sqlite3 \
         php5-pgsql \
         php5-xml \
+        php5-bcmath \
         php5-xsl \
         php5-curl \
         php5-openssl \
